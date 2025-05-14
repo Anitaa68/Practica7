@@ -9,10 +9,31 @@ type EstatusVuelo = {
     Nombre: string
 }
 
+ export type Vuelo = {
+    PaisOrigen: string,
+    CiudadOrigen: string,
+    AeropuertoOrigen: string,
+    PaisDestino: string,
+    CiudadDestino: string,
+    AeropuertoDestino: string,
+    PasajerosActuales: number,
+    NombrePiloto: string,
+    FechaHoraSalida: string,
+    FechaHoraLlegadaAproximada: string,
+    EstatusVuelo: string
+}
+
 const BuscadorVuelos = () => {
     const [ciudadesOrigen, setCiudadesOrigen] = useState<Ciudad[]>();
     const [ciudadesDestino, setCiudadesDestino] = useState<Ciudad[]>();
     const [listaEstatus, setListaEstatus] = useState<EstatusVuelo[]>([]);
+    const [listaVuelos, setListaVuelos] = useState<Vuelo[]>([]);
+
+    const [fechaInicial, setFechaInicial] = useState("");
+    const [fechaFinal, setFechaFinal] = useState("");
+    const [estatus, setEstatus] = useState("");
+    const [origen, setOrigen] = useState("");
+    const [destino, setDestino] = useState("");
 
     const listarCiudadesOrigen = async () => {
         const response = await fetch("http://localhost:5000/api/vuelos/ciudades-origen");
@@ -47,6 +68,14 @@ const BuscadorVuelos = () => {
 
             setListaEstatus(estatus);
         }
+    }
+
+    const listarVuelos = async () => {
+        const response = await fetch("http://localhost:5000/api/vuelos/listar-vuelos");
+        if(response.ok) {
+            const arr = await response.json();
+            setListaVuelos(arr);
+        } 
     }
 
     useEffect(()=> {
@@ -102,12 +131,17 @@ const BuscadorVuelos = () => {
                      <div className="col-sm-4">
                         <div className="mb-3">
                             <label>Estatus</label>
-                            <select className="form-control"></select>
+                            <select className="form-control">
+                                 <option value="">(Todos)</option>
+                                {
+                                  listaEstatus?.map(x => <option key={x.Nombre} value={x.Nombre}>{x.Nombre}</option>)
+                                }
+                            </select>
                         </div>
                     </div>
 
                     <div className="col-12 d-flex justify-content-end">
-                        <button className="btn btn-primary">Buscar</button>
+                        <button className="btn btn-primary" onClick={()=> {listarVuelos();}}>Buscar</button> 
                     </div>
                 </div>
             </div>
@@ -116,7 +150,7 @@ const BuscadorVuelos = () => {
         <div className="card mt-4">
             <div className="card-header">Vuelos Encontrados</div>
             <div className="card-body">
-                <ListadoVuelos />
+                <ListadoVuelos vuelos={listaVuelos} />
             </div>
         </div>
         </>
