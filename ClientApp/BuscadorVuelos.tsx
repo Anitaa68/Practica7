@@ -71,7 +71,18 @@ const BuscadorVuelos = () => {
     }
 
     const listarVuelos = async () => {
-        const response = await fetch("http://localhost:5000/api/vuelos/listar-vuelos");
+       let url =  "http://localhost:5000/api/vuelos/listar-vuelos";
+       let parametros : string[] = [];
+
+       if(estatus){
+        parametros.push("estatus=" + estatus);
+       }
+       
+       if(parametros.length > 0){
+        url += "?"
+        url += parametros.join("&");
+       }
+        const response = await fetch(url);
         if(response.ok) {
             const arr = await response.json();
             setListaVuelos(arr);
@@ -131,7 +142,7 @@ const BuscadorVuelos = () => {
                      <div className="col-sm-4">
                         <div className="mb-3">
                             <label>Estatus</label>
-                            <select className="form-control">
+                            <select className="form-control" onChange={(e)=> setEstatus(e.target.value)} value={estatus}>
                                  <option value="">(Todos)</option>
                                 {
                                   listaEstatus?.map(x => <option key={x.Nombre} value={x.Nombre}>{x.Nombre}</option>)
